@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ObraCerta - Análise de Propostas</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+header {
+    background: #142b45;
+    color: white;
+    padding: 22px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header p {
+    margin-bottom: 0;
+    color: #cbd5e1;
+}
+
+main {
+    max-width: 950px;
+    margin: 30px auto;
+    padding: 15px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px #00000010;
+}
+
+h2 {
+    color: #142b45;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    margin-top: 7px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+button {
+    background: #16834c;
+    color: white;
+    border: none;
+    padding: 14px 22px;
+    border-radius: 7px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #11683c;
+}
+
+.resultado {
+    display: none;
+    padding: 20px;
+    border-radius: 9px;
+    margin-top: 20px;
+}
+
+.resultado h3 {
+    margin-top: 0;
+}
+
+.detalhe {
+    font-size: 18px;
+    margin: 12px 0;
+}
+
+.aviso {
+    background: #fff7ed;
+    border-left: 4px solid #ea580c;
+    padding: 12px;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🏗️ ObraCerta</h1>
+    <p>Inteligência em orçamentos e custos de obras</p>
+</header>
+
+<main>
+
+<section class="card">
+    <h2>Análise de propostas</h2>
+    <p>
+      Informe o orçamento de referência e o valor
+      apresentado pelo prestador.
+    </p>
+
+    <label>Nome da obra</label>
+    <input id="obra" type="text"
+           placeholder="Ex: Edifício Residencial">
+
+    <label>Serviço analisado</label>
+    <input id="servico" type="text"
+           placeholder="Ex: Instalação elétrica">
+
+    <label>Orçamento de referência (R$)</label>
+    <input id="referencia" type="number"
+           min="0.01" step="0.01"
+           placeholder="80000">
+
+    <label>Valor da proposta (R$)</label>
+    <input id="proposta" type="number"
+           min="0.01" step="0.01"
+           placeholder="81000">
+
+    <button onclick="analisar()">
+        Analisar proposta
+    </button>
+</section>
+
+<section class="card">
+    <h2>Resultado da análise</h2>
+
+    <div id="resultado" class="resultado">
+        <h3 id="classificacao"></h3>
+
+        <div class="detalhe" id="diferenca"></div>
+        <div class="detalhe" id="percentual"></div>
+
+        <p id="explicacao"></p>
+
+        <div class="aviso">
+          Esta análise compara somente os valores informados.
+          Não verifica automaticamente escopo, qualidade,
+          materiais, encargos ou condições contratuais.
+          A decisão exige conferência técnica.
+        </div>
+    </div>
+
+    <p id="mensagem">
+      Preencha os valores para iniciar a análise.
+    </p>
+</section>
+
+</main>
+
+<footer>
+    ObraCerta © 2026 - Protótipo educacional
+</footer>
+
+<script>
+
+function analisar() {
+
+    const referencia = Number(
+        document.getElementById("referencia").value
+    );
+
+    const proposta = Number(
+        document.getElementById("proposta").value
+    );
+
+    const obra = document.getElementById("obra").value;
+    const servico = document.getElementById("servico").value;
+
+    if (!Number.isFinite(referencia) ||
+        !Number.isFinite(proposta) ||
+        referencia <= 0 || proposta <= 0) {
+
+        alert("Informe valores válidos e maiores que zero.");
+        return;
+    }
+
+    const diferenca = proposta - referencia;
+
+    const percentual =
+        (diferenca / referencia) * 100;
+
+    let titulo;
+    let explicacao;
+    let fundo;
+
+    // Limites didáticos ajustáveis.
+    // Não representam regras universais de mercado.
+
+    if (percentual < -10) {
+
+        titulo = "ABAIXO DA REFERÊNCIA";
+        explicacao =
+          "Verifique se o prestador incluiu todos os serviços, " +
+          "materiais, encargos e condições necessárias.";
+        fundo = "#ffedd5";
+
+    } else if (percentual > 10) {
+
+        titulo = "ACIMA DA REFERÊNCIA";
+        explicacao =
+          "Verifique os itens adicionais, especificações, " +
+          "produtividade e justificativas do valor apresentado.";
+        fundo = "#fee2e2";
+
+    } else {
+
+        titulo = "PRÓXIMO DA REFERÊNCIA";
+        explicacao =
+          "O valor está dentro da faixa ilustrativa. " +
+          "Ainda é necessário conferir o escopo e as condições.";
+        fundo = "#dcfce7";
+    }
+
+    document.getElementById("resultado").style.display = "block";
+
+    document.getElementById("resultado").style.background = fundo;
+
+    document.getElementById("classificacao").textContent = titulo;
+
+    document.getElementById("diferenca").textContent =
+        "Diferença: R$ " +
+        diferenca.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2
+        });
+
+    document.getElementById("percentual").textContent =
+        "Variação: " +
+        (percentual > 0 ? "+" : "") +
+        percentual.toFixed(2) + "%";
+
+    document.getElementById("explicacao").textContent =
+        explicacao;
+
+    document.getElementById("mensagem").textContent =
+        "Obra: " + (obra || "Não informada") +
+        " | Serviço: " + (servico || "Não informado");
+}
+
+</script>
+
+</body>
+</html>
