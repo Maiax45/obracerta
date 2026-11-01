@@ -4,9 +4,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ObraCerta - Análise de Propostas</title>
+
+<title>ObraCerta - Gestão de Propostas</title>
 
 <style>
+:root {
+    --azul: #142b45;
+    --verde: #16834c;
+    --fundo: #f1f5f9;
+    --texto: #1e293b;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -14,12 +22,12 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f1f5f9;
-    color: #1e293b;
+    background: var(--fundo);
+    color: var(--texto);
 }
 
 header {
-    background: #142b45;
+    background: var(--azul);
     color: white;
     padding: 22px;
 }
@@ -29,86 +37,180 @@ header h1 {
 }
 
 header p {
-    margin-bottom: 0;
     color: #cbd5e1;
+    margin-bottom: 0;
 }
 
 main {
-    max-width: 950px;
-    margin: 30px auto;
+    max-width: 1100px;
+    margin: 25px auto;
     padding: 15px;
 }
 
 .card {
     background: white;
-    padding: 25px;
+    padding: 22px;
     border-radius: 12px;
     margin-bottom: 20px;
-    box-shadow: 0 3px 12px #00000010;
+    box-shadow: 0 3px 12px #0000000c;
 }
 
 h2 {
-    color: #142b45;
+    color: var(--azul);
+    margin-top: 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
 }
 
 label {
     display: block;
-    margin-top: 15px;
     font-weight: bold;
+    margin-top: 14px;
 }
 
 input {
     width: 100%;
-    padding: 13px;
-    margin-top: 7px;
+    padding: 12px;
+    margin-top: 6px;
     border: 1px solid #cbd5e1;
     border-radius: 7px;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 button {
-    background: #16834c;
-    color: white;
-    border: none;
-    padding: 14px 22px;
+    border: 0;
+    padding: 11px 15px;
     border-radius: 7px;
     cursor: pointer;
-    margin-top: 20px;
-    font-size: 16px;
+    font-weight: bold;
+    margin-top: 15px;
 }
 
-button:hover {
-    background: #11683c;
+.btn-principal {
+    background: var(--verde);
+    color: white;
 }
 
-.resultado {
-    display: none;
-    padding: 20px;
+.btn-secundario {
+    background: #e2e8f0;
+    color: var(--azul);
+}
+
+.btn-excluir {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.btn-editar {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.indicador {
+    background: #eff6ff;
+    padding: 17px;
     border-radius: 9px;
-    margin-top: 20px;
 }
 
-.resultado h3 {
-    margin-top: 0;
+.indicador strong {
+    display: block;
+    font-size: 23px;
+    margin-top: 8px;
 }
 
-.detalhe {
-    font-size: 18px;
-    margin: 12px 0;
+.tabela-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 750px;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+    background: #f8fafc;
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.compatível {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.abaixo {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.acima {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.inconclusivo {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+#mensagem {
+    color: #64748b;
+}
+
+#pesquisa {
+    margin-bottom: 15px;
 }
 
 .aviso {
+    padding: 12px;
     background: #fff7ed;
     border-left: 4px solid #ea580c;
-    padding: 12px;
+    font-size: 13px;
     margin-top: 15px;
-    font-size: 14px;
+}
+
+.acoes button {
+    margin: 3px;
 }
 
 footer {
     text-align: center;
     padding: 25px;
     color: #64748b;
+}
+
+@media(max-width:650px) {
+    .grid, .resumo {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 16px;
+    }
 }
 </style>
 </head>
@@ -122,150 +224,498 @@ footer {
 
 <main>
 
-<section class="card">
-    <h2>Análise de propostas</h2>
-    <p>
-      Informe o orçamento de referência e o valor
-      apresentado pelo prestador.
-    </p>
+    <section class="resumo">
 
-    <label>Nome da obra</label>
-    <input id="obra" type="text"
-           placeholder="Ex: Edifício Residencial">
+        <div class="indicador">
+            Propostas cadastradas
+            <strong id="totalPropostas">0</strong>
+        </div>
 
-    <label>Serviço analisado</label>
-    <input id="servico" type="text"
-           placeholder="Ex: Instalação elétrica">
+        <div class="indicador">
+            Valores abaixo da referência
+            <strong id="totalAbaixo">0</strong>
+        </div>
 
-    <label>Orçamento de referência (R$)</label>
-    <input id="referencia" type="number"
-           min="0.01" step="0.01"
-           placeholder="80000">
+        <div class="indicador">
+            Valores acima da referência
+            <strong id="totalAcima">0</strong>
+        </div>
 
-    <label>Valor da proposta (R$)</label>
-    <input id="proposta" type="number"
-           min="0.01" step="0.01"
-           placeholder="81000">
+    </section>
 
-    <button onclick="analisar()">
-        Analisar proposta
-    </button>
-</section>
+    <section class="card">
 
-<section class="card">
-    <h2>Resultado da análise</h2>
+        <h2 id="tituloFormulario">
+            Cadastro de proposta
+        </h2>
 
-    <div id="resultado" class="resultado">
-        <h3 id="classificacao"></h3>
+        <form id="formulario">
 
-        <div class="detalhe" id="diferenca"></div>
-        <div class="detalhe" id="percentual"></div>
+            <div class="grid">
 
-        <p id="explicacao"></p>
+                <div>
+                    <label>Nome da obra</label>
+                    <input id="obra" required
+                        placeholder="Ex: Edifício Residencial">
+                </div>
+
+                <div>
+                    <label>Serviço</label>
+                    <input id="servico" required
+                        placeholder="Ex: Instalação elétrica">
+                </div>
+
+                <div>
+                    <label>Nome do prestador</label>
+                    <input id="prestador" required
+                        placeholder="Nome da empresa ou profissional">
+                </div>
+
+                <div>
+                    <label>Data da proposta</label>
+                    <input id="data" type="date" required>
+                </div>
+
+                <div>
+                    <label>Orçamento de referência (R$)</label>
+                    <input id="referencia" type="number"
+                        min="0.01" step="0.01" required
+                        placeholder="80000">
+                </div>
+
+                <div>
+                    <label>Valor da proposta (R$)</label>
+                    <input id="valor" type="number"
+                        min="0.01" step="0.01" required
+                        placeholder="81000">
+                </div>
+
+            </div>
+
+            <button class="btn-principal" type="submit">
+                Salvar proposta
+            </button>
+
+            <button class="btn-secundario" type="button"
+                id="cancelarEdicao" hidden>
+                Cancelar edição
+            </button>
+
+        </form>
 
         <div class="aviso">
-          Esta análise compara somente os valores informados.
-          Não verifica automaticamente escopo, qualidade,
-          materiais, encargos ou condições contratuais.
-          A decisão exige conferência técnica.
+            A classificação é preliminar e compara somente
+            os valores informados. A análise técnica exige
+            verificar escopo, quantidades, materiais,
+            encargos e condições contratuais.
         </div>
-    </div>
 
-    <p id="mensagem">
-      Preencha os valores para iniciar a análise.
-    </p>
-</section>
+    </section>
+
+    <section class="card">
+
+        <h2>Propostas cadastradas</h2>
+
+        <input id="pesquisa" type="search"
+            placeholder="Pesquisar obra, serviço ou prestador...">
+
+        <div class="tabela-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Obra / Serviço</th>
+                        <th>Prestador</th>
+                        <th>Referência</th>
+                        <th>Proposta</th>
+                        <th>Diferença</th>
+                        <th>Análise</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody id="listaPropostas"></tbody>
+
+            </table>
+
+        </div>
+
+        <p id="mensagem">
+            Nenhuma proposta cadastrada.
+        </p>
+
+    </section>
 
 </main>
 
 <footer>
-    ObraCerta © 2026 - Protótipo educacional
+    ObraCerta © 2026 - Sistema de análise de propostas
 </footer>
 
 <script>
 
-function analisar() {
+// 1. CARREGAR OS DADOS DO NAVEGADOR
+
+let propostas = [];
+
+try {
+    const dados = localStorage.getItem("obracerta_propostas");
+    propostas = dados ? JSON.parse(dados) : [];
+
+    if (!Array.isArray(propostas)) {
+        propostas = [];
+    }
+} catch (erro) {
+    propostas = [];
+}
+
+let idEdicao = null;
+
+
+// 2. FUNÇÃO PARA GUARDAR OS DADOS
+
+function guardarDados() {
+
+    try {
+        localStorage.setItem(
+            "obracerta_propostas",
+            JSON.stringify(propostas)
+        );
+
+        return true;
+
+    } catch (erro) {
+
+        alert("Não foi possível salvar os dados neste navegador.");
+        return false;
+    }
+}
+
+
+// 3. FORMATAR VALORES EM REAIS
+
+function moeda(valor) {
+
+    return Number(valor).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+}
+
+
+// 4. ANALISAR UMA PROPOSTA
+
+function analisar(referencia, valor) {
+
+    const diferenca = valor - referencia;
+
+    const percentual = (diferenca / referencia) * 100;
+
+    let classificacao;
+
+    if (percentual < -10) {
+
+        classificacao = "Abaixo";
+
+    } else if (percentual > 10) {
+
+        classificacao = "Acima";
+
+    } else {
+
+        classificacao = "Compatível";
+    }
+
+    return {
+        diferenca,
+        percentual,
+        classificacao
+    };
+}
+
+
+// 5. CADASTRAR OU EDITAR UMA PROPOSTA
+
+document.getElementById("formulario")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const obra = document.getElementById("obra").value.trim();
+    const servico = document.getElementById("servico").value.trim();
+    const prestador = document.getElementById("prestador").value.trim();
+    const data = document.getElementById("data").value;
 
     const referencia = Number(
         document.getElementById("referencia").value
     );
 
-    const proposta = Number(
-        document.getElementById("proposta").value
+    const valor = Number(
+        document.getElementById("valor").value
     );
 
-    const obra = document.getElementById("obra").value;
-    const servico = document.getElementById("servico").value;
+    if (!obra || !servico || !prestador || !data ||
+        !Number.isFinite(referencia) ||
+        !Number.isFinite(valor) ||
+        referencia <= 0 || valor <= 0) {
 
-    if (!Number.isFinite(referencia) ||
-        !Number.isFinite(proposta) ||
-        referencia <= 0 || proposta <= 0) {
-
-        alert("Informe valores válidos e maiores que zero.");
+        alert("Preencha todos os campos corretamente.");
         return;
     }
 
-    const diferenca = proposta - referencia;
+    const resultado = analisar(referencia, valor);
 
-    const percentual =
-        (diferenca / referencia) * 100;
+    const proposta = {
 
-    let titulo;
-    let explicacao;
-    let fundo;
+        id: idEdicao || (
+            window.crypto && crypto.randomUUID
+                ? crypto.randomUUID()
+                : String(Date.now())
+        ),
 
-    // Limites didáticos ajustáveis.
-    // Não representam regras universais de mercado.
+        obra,
+        servico,
+        prestador,
+        data,
+        referencia,
+        valor,
+        diferenca: resultado.diferenca,
+        percentual: resultado.percentual,
+        classificacao: resultado.classificacao
+    };
 
-    if (percentual < -10) {
+    const dadosAnteriores = [...propostas];
 
-        titulo = "ABAIXO DA REFERÊNCIA";
-        explicacao =
-          "Verifique se o prestador incluiu todos os serviços, " +
-          "materiais, encargos e condições necessárias.";
-        fundo = "#ffedd5";
+    if (idEdicao) {
 
-    } else if (percentual > 10) {
-
-        titulo = "ACIMA DA REFERÊNCIA";
-        explicacao =
-          "Verifique os itens adicionais, especificações, " +
-          "produtividade e justificativas do valor apresentado.";
-        fundo = "#fee2e2";
+        propostas = propostas.map(item =>
+            item.id === idEdicao ? proposta : item
+        );
 
     } else {
 
-        titulo = "PRÓXIMO DA REFERÊNCIA";
-        explicacao =
-          "O valor está dentro da faixa ilustrativa. " +
-          "Ainda é necessário conferir o escopo e as condições.";
-        fundo = "#dcfce7";
+        propostas.push(proposta);
     }
 
-    document.getElementById("resultado").style.display = "block";
+    if (!guardarDados()) {
+        propostas = dadosAnteriores;
+        return;
+    }
 
-    document.getElementById("resultado").style.background = fundo;
+    alert(idEdicao
+        ? "Proposta atualizada!"
+        : "Proposta cadastrada com sucesso!");
 
-    document.getElementById("classificacao").textContent = titulo;
+    limparFormulario();
+    atualizarTela();
 
-    document.getElementById("diferenca").textContent =
-        "Diferença: R$ " +
-        diferenca.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2
+});
+
+
+// 6. LIMPAR FORMULÁRIO
+
+function limparFormulario() {
+
+    document.getElementById("formulario").reset();
+
+    idEdicao = null;
+
+    document.getElementById("tituloFormulario").textContent =
+        "Cadastro de proposta";
+
+    document.getElementById("cancelarEdicao").hidden = true;
+}
+
+
+// 7. PREPARAR UMA PROPOSTA PARA EDIÇÃO
+
+function editarProposta(id) {
+
+    const proposta = propostas.find(item => item.id === id);
+
+    if (!proposta) return;
+
+    document.getElementById("obra").value = proposta.obra;
+    document.getElementById("servico").value = proposta.servico;
+    document.getElementById("prestador").value = proposta.prestador;
+    document.getElementById("data").value = proposta.data;
+    document.getElementById("referencia").value = proposta.referencia;
+    document.getElementById("valor").value = proposta.valor;
+
+    idEdicao = id;
+
+    document.getElementById("tituloFormulario").textContent =
+        "Editar proposta";
+
+    document.getElementById("cancelarEdicao").hidden = false;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+// 8. CANCELAR EDIÇÃO
+
+document.getElementById("cancelarEdicao")
+.addEventListener("click", limparFormulario);
+
+
+// 9. EXCLUIR UMA PROPOSTA
+
+function excluirProposta(id) {
+
+    const confirmar = confirm(
+        "Deseja realmente excluir esta proposta?"
+    );
+
+    if (!confirmar) return;
+
+    const dadosAnteriores = [...propostas];
+
+    propostas = propostas.filter(item => item.id !== id);
+
+    if (!guardarDados()) {
+        propostas = dadosAnteriores;
+        return;
+    }
+
+    if (idEdicao === id) {
+        limparFormulario();
+    }
+
+    atualizarTela();
+}
+
+
+// 10. CRIAR ELEMENTOS DE TEXTO COM SEGURANÇA
+
+function adicionarTexto(celula, valor) {
+
+    celula.textContent = valor;
+}
+
+
+// 11. ATUALIZAR LISTAGEM E INDICADORES
+
+function atualizarTela() {
+
+    const lista = document.getElementById("listaPropostas");
+
+    const busca = document.getElementById("pesquisa")
+        .value.toLowerCase().trim();
+
+    lista.replaceChildren();
+
+    const filtradas = propostas.filter(item => {
+
+        return (
+            item.obra.toLowerCase().includes(busca) ||
+            item.servico.toLowerCase().includes(busca) ||
+            item.prestador.toLowerCase().includes(busca)
+        );
+
+    });
+
+    filtradas.forEach(item => {
+
+        const linha = document.createElement("tr");
+
+        const campos = [
+            item.obra + " / " + item.servico,
+            item.prestador,
+            moeda(item.referencia),
+            moeda(item.valor),
+            moeda(item.diferenca) + " (" +
+                item.percentual.toFixed(2) + "%)"
+        ];
+
+        campos.forEach(valor => {
+
+            const celula = document.createElement("td");
+
+            adicionarTexto(celula, valor);
+
+            linha.appendChild(celula);
         });
 
-    document.getElementById("percentual").textContent =
-        "Variação: " +
-        (percentual > 0 ? "+" : "") +
-        percentual.toFixed(2) + "%";
+        const celulaStatus = document.createElement("td");
 
-    document.getElementById("explicacao").textContent =
-        explicacao;
+        const etiqueta = document.createElement("span");
+
+        etiqueta.className = "status " +
+            (item.classificacao === "Abaixo"
+                ? "abaixo"
+                : item.classificacao === "Acima"
+                    ? "acima"
+                    : "compatível");
+
+        etiqueta.textContent = item.classificacao;
+
+        celulaStatus.appendChild(etiqueta);
+        linha.appendChild(celulaStatus);
+
+        const celulaAcoes = document.createElement("td");
+
+        celulaAcoes.className = "acoes";
+
+        const botaoEditar = document.createElement("button");
+
+        botaoEditar.className = "btn-editar";
+        botaoEditar.textContent = "Editar";
+
+        botaoEditar.addEventListener("click", () =>
+            editarProposta(item.id)
+        );
+
+        const botaoExcluir = document.createElement("button");
+
+        botaoExcluir.className = "btn-excluir";
+        botaoExcluir.textContent = "Excluir";
+
+        botaoExcluir.addEventListener("click", () =>
+            excluirProposta(item.id)
+        );
+
+        celulaAcoes.append(botaoEditar, botaoExcluir);
+
+        linha.appendChild(celulaAcoes);
+
+        lista.appendChild(linha);
+
+    });
+
+    document.getElementById("totalPropostas").textContent =
+        propostas.length;
+
+    document.getElementById("totalAbaixo").textContent =
+        propostas.filter(item =>
+            item.classificacao === "Abaixo"
+        ).length;
+
+    document.getElementById("totalAcima").textContent =
+        propostas.filter(item =>
+            item.classificacao === "Acima"
+        ).length;
 
     document.getElementById("mensagem").textContent =
-        "Obra: " + (obra || "Não informada") +
-        " | Serviço: " + (servico || "Não informado");
+        filtradas.length === 0
+            ? "Nenhuma proposta encontrada."
+            : "Exibindo " + filtradas.length + " proposta(s).";
 }
+
+
+// 12. PESQUISAR PROPOSTAS
+
+document.getElementById("pesquisa")
+.addEventListener("input", atualizarTela);
+
+
+// 13. INICIAR O SISTEMA
+
+atualizarTela();
 
 </script>
 
